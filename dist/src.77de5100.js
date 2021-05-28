@@ -344,6 +344,40 @@ function () {
 }();
 
 exports.Paddle = Paddle;
+},{}],"Collision.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Collision = void 0;
+
+var Collision =
+/** @class */
+function () {
+  function Collision() {}
+
+  Collision.prototype.checkBallCollision = function (ball, paddle, view) {
+    //Check ball collision with paddle
+    if (ball.pos.x + ball.width > paddle.pos.x && ball.pos.x < paddle.pos.x + paddle.width && ball.pos.y + ball.height === paddle.pos.y) {
+      ball.changeYDirection();
+    } //Check ball collision with walls
+
+
+    if (ball.pos.x > view.canvas.width - ball.width || ball.pos.x < 0) {
+      ball.changeXDirection();
+    } //Ball movement Y constraits
+
+
+    if (ball.pos.y < 0) {
+      ball.changeYDirection();
+    }
+  };
+
+  return Collision;
+}();
+
+exports.Collision = Collision;
 },{}],"images/paddle.png":[function(require,module,exports) {
 module.exports = "/paddle.f48d929a.png";
 },{}],"images/ball.png":[function(require,module,exports) {
@@ -546,6 +580,8 @@ var _Ball = require("./sprites/Ball");
 
 var _Paddle = require("./sprites/Paddle");
 
+var _Collision = require("./Collision");
+
 var _paddle = _interopRequireDefault(require("./images/paddle.png"));
 
 var _ball = _interopRequireDefault(require("./images/ball.png"));
@@ -572,7 +608,7 @@ function setGameWin(view) {
   gameOver = false;
 }
 
-function gameLoop(view, bricks, paddle, ball) {
+function gameLoop(view, bricks, paddle, ball, collision) {
   view.clear();
   view.drawBricks(bricks);
   view.drawSprite(paddle);
@@ -584,8 +620,9 @@ function gameLoop(view, bricks, paddle, ball) {
     paddle.movePaddle();
   }
 
+  collision.checkBallCollision(ball, paddle, view);
   requestAnimationFrame(function () {
-    return gameLoop(view, bricks, paddle, ball);
+    return gameLoop(view, bricks, paddle, ball, collision);
   });
 }
 
@@ -593,7 +630,9 @@ function startGame(view) {
   //reset displays
   score = 0;
   view.drawInfo('');
-  view.drawScore(0);
+  view.drawScore(0); // create a collision instance
+
+  var collision = new _Collision.Collision();
   var bricks = (0, _helpers.createBricks)();
   var ball = new _Ball.Ball(_setup.BALL_SPEED, _setup.BALL_SIZE, {
     x: _setup.BALL_STARTX,
@@ -603,13 +642,13 @@ function startGame(view) {
     x: _setup.PADDLE_STARTX,
     y: view.canvas.height - _setup.PADDLE_HEIGHT - 5
   }, _paddle.default);
-  gameLoop(view, bricks, paddle, ball);
+  gameLoop(view, bricks, paddle, ball, collision);
 } //Create a new view
 
 
 var view = new _CanvasView.CanvasView('#playField');
 view.initStartButton(startGame);
-},{"./view/CanvasView":"view/CanvasView.ts","./sprites/Ball":"sprites/Ball.ts","./sprites/Paddle":"sprites/Paddle.ts","./images/paddle.png":"images/paddle.png","./images/ball.png":"images/ball.png","./setup":"setup.ts","./helpers":"helpers.ts"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./view/CanvasView":"view/CanvasView.ts","./sprites/Ball":"sprites/Ball.ts","./sprites/Paddle":"sprites/Paddle.ts","./Collision":"Collision.ts","./images/paddle.png":"images/paddle.png","./images/ball.png":"images/ball.png","./setup":"setup.ts","./helpers":"helpers.ts"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
