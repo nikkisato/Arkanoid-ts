@@ -357,6 +357,35 @@ var Collision =
 function () {
   function Collision() {}
 
+  Collision.prototype.isCollidingBrick = function (ball, brick) {
+    if (ball.pos.x < brick.pos.x + brick.width && ball.pos.x + ball.width > brick.pos.x && ball.pos.y < brick.pos.y + brick.height && ball.pos.y + ball.height > brick.pos.y) {
+      return true;
+    }
+
+    return false;
+  }; //check ball Collision with bricks
+
+
+  Collision.prototype.isCollidingBricks = function (ball, bricks) {
+    var _this = this;
+
+    var colliding = false;
+    bricks.forEach(function (brick, i) {
+      if (_this.isCollidingBrick(ball, brick)) {
+        ball.changeYDirection();
+
+        if (brick.energy === 1) {
+          bricks.splice(i, 1);
+        } else {
+          brick.energy -= 1;
+        }
+
+        colliding = true;
+      }
+    });
+    return colliding;
+  };
+
   Collision.prototype.checkBallCollision = function (ball, paddle, view) {
     //Check ball collision with paddle
     if (ball.pos.x + ball.width > paddle.pos.x && ball.pos.x < paddle.pos.x + paddle.width && ball.pos.y + ball.height === paddle.pos.y) {
@@ -621,6 +650,13 @@ function gameLoop(view, bricks, paddle, ball, collision) {
   }
 
   collision.checkBallCollision(ball, paddle, view);
+  var collidingBrick = collision.isCollidingBricks(ball, bricks);
+
+  if (collidingBrick) {
+    score += 1;
+    view.drawScore(score);
+  }
+
   requestAnimationFrame(function () {
     return gameLoop(view, bricks, paddle, ball, collision);
   });
